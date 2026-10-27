@@ -1,0 +1,35 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: spartin
+      POSTGRES_PASSWORD: spartin_dev_only
+      POSTGRES_DB: spartin
+    ports:
+      - '5432:5432'
+    volumes:
+      - spartin_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U spartin']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  db_test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: spartin
+      POSTGRES_PASSWORD: spartin_dev_only
+      POSTGRES_DB: spartin_test
+    ports:
+      - '5433:5432'
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U spartin']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  spartin_pgdata:
