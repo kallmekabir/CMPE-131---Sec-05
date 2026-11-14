@@ -60,13 +60,13 @@ curl -s -X POST localhost:3000/api/auth/login -H 'Content-Type: application/json
 | --- | --- | --- |
 | `GET /api/events` | any | Query: `q`, `tag`, `from`, `to`, `feed`, `includePassed`, `page` (>=1), `limit` (1-50, default 20). Returns `{ items, page, limit, total, hasMore }` ordered by start time. Excludes cancelled, deleted and ended events and the caller's passed events |
 | `GET /api/events/:eventId` | any | one EventCard; 404 if missing/deleted |
-| `POST /api/events` | ORGANIZER | 201. Body: `title` (1-120, no `<>`), `description` (1-5000), `startsAt` (future), `location` (1-200, no `<>`), optional `endsAt` (>= startsAt), `capacity` (int >= 0 or null), `waitlistEnabled` (default false), `imageUrl` (https), `tags` (<=10, 1-30 chars, lowercased). Unknown fields (e.g. `organizerId`) -> 400. Owner is always the caller |
+| `POST /api/events` | any | 201. Body: `title` (1-120, no `<>`), `description` (1-5000), `startsAt` (future), `location` (1-200, no `<>`), optional `endsAt` (>= startsAt), `capacity` (int >= 0 or null), `waitlistEnabled` (default false), `imageUrl` (https), `tags` (<=10, 1-30 chars, lowercased). Unknown fields (e.g. `organizerId`) -> 400. Owner is always the caller |
 | `PATCH /api/events/:eventId` | owner | partial update, same rules; at least one field. 409 if `capacity` < joined count. Raising capacity promotes the waitlist |
 | `POST /api/events/:eventId/reschedule` | owner | `{ startsAt, endsAt? }` |
 | `DELETE /api/events/:eventId` | owner | 204 (soft delete); repeat -> 404 |
 | `GET /api/events/:eventId/participants?limit=` | owner | joined then waitlisted users (public fields only, no emails) |
 
-Non-owners (including other organizers) get 403 on owner routes; participants get 403 on all organizer routes.
+Any verified user may host (create) events (PRD 4.1). Owner routes (`PATCH`, `reschedule`, `DELETE`, `participants`) return 403 to everyone except the event's creator, regardless of role.
 
 ## Participation (any authenticated role)
 

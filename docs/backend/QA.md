@@ -18,7 +18,7 @@ All use password `DevOnly-Password-1` (fake, local only; `npm run db:seed` refus
 | `organizer.dev@sjsu.edu` | ORGANIZER | owns most seeded events |
 | `organizer2.dev@sjsu.edu` | ORGANIZER | owns "Resume Workshop"; use to test cross-owner 403 |
 | `participant.dev@sjsu.edu` | PARTICIPANT | interests: music, hiking |
-| `nonorganizer.dev@sjsu.edu` | PARTICIPANT | unauthorized-for-organizer-actions user |
+| `nonorganizer.dev@sjsu.edu` | PARTICIPANT | non-owner: use to test owner-only 403s (it *can* create its own events) |
 | `unverified.dev@sjsu.edu` | PARTICIPANT | email not verified (login returns 403) |
 | `filler1..4.dev@sjsu.edu` | PARTICIPANT | occupy seats / waitlist |
 
@@ -50,7 +50,7 @@ The requirements documents were not available, so this maps the written brief, n
 | Role cannot be self-changed | `integration/users` (protected fields), `security/authorization` (escalation) |
 | Event create/read/update/reschedule/delete | `integration/events` |
 | Event validation, no record on invalid input | `unit/eventValidation`, `integration/events` |
-| Organizer-only and owner-only | `unit/authorization`, `integration/events`, `security/authorization` |
+| Owner-only management (any verified user can create) | `unit/authorization`, `integration/events`, `security/authorization` |
 | Pagination, filtering, exclusion of cancelled/deleted/ended/passed | `integration/events` |
 | Join under / exactly at capacity / full + waitlist / full without waitlist | `unit/capacity`, `integration/participation` |
 | Duplicate and repeated joins idempotent | `integration/participation` (idempotent, same user x10 concurrent) |
@@ -109,7 +109,7 @@ The load mix contains no third-party calls (map/calendar/share adapters build li
 ## Known limitations
 
 - Requirements documents were unavailable; assumptions are in `DECISIONS.md`.
-- No real email delivery, DUO/SSO, password reset or organizer onboarding yet.
+- No real email delivery, DUO/SSO or password reset yet. (Organizer onboarding is no longer needed: any verified user can host.)
 - Rate limiting is in-memory per process; use a shared store (e.g. Redis) when running multiple instances.
 - Map/calendar/share adapters generate links only; no live Google API integration, no geocoding.
 - Participants are not notified of reschedules or cancellations.

@@ -35,11 +35,13 @@ describe('POST /api/events', () => {
     expect(res.body.data.organizer).not.toHaveProperty('universityEmail');
   });
 
-  it('forbids participants and requires authentication', async () => {
+  it('lets any verified user host an event and requires authentication', async () => {
     const p = await actor(t.db);
-    expect((await api().post('/api/events').set(p.headers).send(payload())).status).toBe(403);
     expect((await api().post('/api/events').send(payload())).status).toBe(401);
     expect(await t.db.event.count()).toBe(0);
+    const res = await api().post('/api/events').set(p.headers).send(payload());
+    expect(res.status).toBe(201);
+    expect(res.body.data.organizer.id).toBe(p.user.id);
   });
 
   it.each([

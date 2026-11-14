@@ -13,8 +13,14 @@ describe('assertCanManageEvent', () => {
     );
   });
 
-  it('forbids a participant even when ids match', () => {
-    expect(() => assertCanManageEvent({ userId: 'org-1', role: 'PARTICIPANT' }, event)).toThrow(
+  it('allows a participant-role user who owns the event (any user can host)', () => {
+    expect(() =>
+      assertCanManageEvent({ userId: 'org-1', role: 'PARTICIPANT' }, event),
+    ).not.toThrow();
+  });
+
+  it('forbids a participant who does not own the event', () => {
+    expect(() => assertCanManageEvent({ userId: 'p-9', role: 'PARTICIPANT' }, event)).toThrow(
       expect.objectContaining({ status: 403 }),
     );
   });

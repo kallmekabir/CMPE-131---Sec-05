@@ -9,13 +9,12 @@ afterAll(() => t.db.$disconnect());
 const startsAt = new Date(Date.now() + 5 * 86400000).toISOString();
 const newEvent = { title: 'T', description: 'D', startsAt, location: 'L' };
 
-describe('participant calling organizer endpoints', () => {
-  it('is forbidden everywhere an organizer role is required', async () => {
+describe('non-owner calling owner-only endpoints', () => {
+  it('is forbidden on every owner-only route', async () => {
     const org = await actor(t.db, 'ORGANIZER');
     const p = await actor(t.db);
     const e = await createEvent(t.db, org.user.id);
     const calls = [
-      api().post('/api/events').set(p.headers).send(newEvent),
       api().patch(`/api/events/${e.id}`).set(p.headers).send({ title: 'x' }),
       api().delete(`/api/events/${e.id}`).set(p.headers),
       api().post(`/api/events/${e.id}/reschedule`).set(p.headers).send({ startsAt }),
@@ -79,7 +78,6 @@ describe('role escalation', () => {
     expect((await t.db.user.findUniqueOrThrow({ where: { id: p.user.id } })).role).toBe(
       'PARTICIPANT',
     );
-    expect((await api().post('/api/events').set(p.headers).send(newEvent)).status).toBe(403);
   });
 
   it('a token claiming ORGANIZER signed with the wrong key is rejected', async () => {
