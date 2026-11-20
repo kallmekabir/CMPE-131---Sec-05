@@ -51,6 +51,9 @@ export class SmtpEmailAdapter implements EmailAdapter {
         port: settings.port,
         secure: settings.port === 465,
         auth: { user: settings.user, pass: settings.pass },
+        connectionTimeout: 8000,
+        greetingTimeout: 8000,
+        socketTimeout: 10000,
       });
   }
 

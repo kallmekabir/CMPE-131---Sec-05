@@ -6,6 +6,11 @@ import { SmtpEmailAdapter } from './adapters/email/EmailAdapter';
 
 const config = loadConfig();
 const logger = createLogger(config.logLevel);
+if (config.skipEmailVerification) {
+  logger.warn(
+    'BETA_SKIP_EMAIL_VERIFICATION is on: accounts are verified without email confirmation',
+  );
+}
 const db = createDb(config.databaseUrl);
 const app = createApp({
   config,
