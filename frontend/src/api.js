@@ -142,6 +142,9 @@ export async function login(universityEmail, password) {
 export const register = (form) =>
   request('/api/auth/register', { method: 'POST', auth: false, body: form });
 
+export const verifyEmail = (token) =>
+  request('/api/auth/verify-email', { method: 'POST', auth: false, body: { token } });
+
 export async function logout() {
   const refreshToken = readStorage(REFRESH_KEY);
   clearTokens();

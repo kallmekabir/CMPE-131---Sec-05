@@ -11,6 +11,7 @@ import MapPage from './pages/MapPage';
 import MyEventsPage from './pages/MyEventsPage';
 import ProfilePage from './pages/ProfilePage';
 import RegisterPage from './pages/RegisterPage';
+import VerifyEmailPage from './pages/VerifyEmailPage';
 
 export default function App() {
   return (
@@ -18,6 +19,7 @@ export default function App() {
       {/* Public pages */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/verify-email" element={<VerifyEmailPage />} />
 
       {/* Everything else needs a logged-in user and shows the bottom nav */}
       <Route
