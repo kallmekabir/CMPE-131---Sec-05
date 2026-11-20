@@ -230,3 +230,13 @@ input, textarea, select { font: inherit; color: inherit; }
 .map-pin.approx { background: var(--muted); }
 .map-pin.me { background: var(--gold); border-radius: 50%; transform: none; }
 .leaflet-popup-content { font: inherit; display: grid; gap: 4px; }
+
+/* Calendar month grid */
+.cal-head { display: flex; align-items: center; justify-content: space-between; margin: 8px 0; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-weekday { text-align: center; font-size: 0.75rem; color: var(--muted); padding: 4px 0; }
+.cal-day { position: relative; aspect-ratio: 1; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); font: inherit; cursor: pointer; }
+.cal-day.today { border-color: var(--blue); font-weight: 700; }
+.cal-day.selected { background: var(--blue); color: #fff; border-color: var(--blue); }
+.cal-dot { position: absolute; bottom: 6px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; border-radius: 50%; background: var(--gold); }
+.cal-selected { margin: 16px 0 8px; font-size: 1rem; }
