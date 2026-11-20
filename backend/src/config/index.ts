@@ -15,6 +15,11 @@ const schema = z.object({
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error', 'silent']).default('info'),
   AUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(10),
   API_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(300),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().positive().default(587),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.string().optional(),
 });
 
 export type Config = {
@@ -31,6 +36,7 @@ export type Config = {
   logLevel: string;
   authRateLimitMax: number;
   apiRateLimitMax: number;
+  smtp: { host: string; port: number; user: string; pass: string; from: string } | null;
 };
 
 const csv = (value: string) =>
@@ -49,6 +55,10 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): Config {
   if (e.NODE_ENV === 'production' && e.AUTH_PROVIDER === 'dev') {
     throw new Error('AUTH_PROVIDER=dev is not allowed when NODE_ENV=production');
   }
+  const smtpFields = [e.SMTP_HOST, e.SMTP_USER, e.SMTP_PASS];
+  if (smtpFields.some(Boolean) && !smtpFields.every(Boolean)) {
+    throw new Error('SMTP_HOST, SMTP_USER and SMTP_PASS must all be set together');
+  }
   return {
     env: e.NODE_ENV,
     port: e.PORT,
@@ -63,5 +73,15 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): Config {
     logLevel: e.LOG_LEVEL,
     authRateLimitMax: e.AUTH_RATE_LIMIT_MAX,
     apiRateLimitMax: e.API_RATE_LIMIT_MAX,
+    smtp:
+      e.SMTP_HOST && e.SMTP_USER && e.SMTP_PASS
+        ? {
+            host: e.SMTP_HOST,
+            port: e.SMTP_PORT,
+            user: e.SMTP_USER,
+            pass: e.SMTP_PASS,
+            from: e.SMTP_FROM ?? `SpartIN <${e.SMTP_USER}>`,
+          }
+        : null,
   };
 }
