@@ -20,11 +20,11 @@ The five requirements documents (PRD, SFDS, SAD, Project-Plan, Test-Plan) were *
 | 12  | Events that already ended (or started with no end time) are excluded from discovery and cannot be joined                      | "available events"                                                    |
 | 13  | Only `@sjsu.edu` exact-domain emails are accepted (`ALLOWED_EMAIL_DOMAINS`)                                                   | subdomains such as `mail.sjsu.edu` are rejected on purpose            |
 | 14  | Text safety: control characters rejected everywhere; `<` `>` rejected in title/location/tags; descriptions are plain text the client must not render as HTML | JSON API; output encoding is the client's job |
-| 15  | `POST /api/auth/register` always creates `PARTICIPANT`                                                                        | no self-service organizer                                             |
+| 15  | `POST /api/auth/register` always creates `PARTICIPANT`, but **any verified user may create events**; only the event's owner may edit/reschedule/delete it (changed 11-13-2026) | PRD 4.1: users create casual events; NFR-02 enforced by ownership |
 
 ## Needs team confirmation
 
-1. **How does a user become an organizer?** Currently only by direct database/seed change. Options: admin endpoint, approved-organizer email list, or an application flow.
+1. ~~How does a user become an organizer?~~ Resolved 11-13-2026: every verified user can host; the `ORGANIZER` role is kept in the schema but no longer gates any route.
 2. **Real email provider.** `UnconfiguredEmailAdapter` is the default and returns a controlled failure; registration still succeeds and reports `verificationEmailSent: false`. With `AUTH_PROVIDER=local`, users cannot log in until a real adapter delivers the verification link.
 3. **DUO/institutional login.** Not implemented. Implement `AuthProvider` (or add a new login route) once the university integration details exist.
 4. **Soft-delete vs. separate "cancel" and "delete"** if the PRD distinguishes them.
