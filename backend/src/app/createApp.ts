@@ -57,7 +57,10 @@ export function createApp(deps: AppDeps) {
     users,
     tokens,
     tokenService,
-    provider: config.authProvider === 'dev' ? createDevAuthProvider() : createLocalAuthProvider(),
+    provider:
+      config.authProvider === 'dev'
+        ? createDevAuthProvider()
+        : createLocalAuthProvider(config.skipEmailVerification),
     email: deps.email ?? new UnconfiguredEmailAdapter(),
     logger,
     allowedEmailDomains: config.allowedEmailDomains,

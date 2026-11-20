@@ -1,3 +1,4 @@
+import { createLocalAuthProvider } from '../../src/adapters/authentication/AuthProvider';
 import type { Transporter } from 'nodemailer';
 import { SmtpEmailAdapter } from '../../src/adapters/email/EmailAdapter';
 import { loadConfig } from '../../src/config';
@@ -47,4 +48,19 @@ describe('SMTP config', () => {
     ).toMatchObject({ host: 'h', port: 587, from: 'SpartIN <u@x.com>' }));
   it('rejects partial settings', () =>
     expect(() => loadConfig({ ...base, SMTP_HOST: 'h' })).toThrow(/together/));
+});
+
+describe('BETA_SKIP_EMAIL_VERIFICATION', () => {
+  const base = { DATABASE_URL: 'postgresql://x', JWT_ACCESS_SECRET: 'x'.repeat(32) };
+  it('is off by default', () => expect(loadConfig(base).skipEmailVerification).toBe(false));
+  it('turns on only for the exact value "true"', () => {
+    expect(
+      loadConfig({ ...base, BETA_SKIP_EMAIL_VERIFICATION: 'true' }).skipEmailVerification,
+    ).toBe(true);
+    expect(() => loadConfig({ ...base, BETA_SKIP_EMAIL_VERIFICATION: 'yes' })).toThrow();
+  });
+  it('local provider only auto-verifies when asked', () => {
+    expect(createLocalAuthProvider().autoVerifyEmail).toBe(false);
+    expect(createLocalAuthProvider(true).autoVerifyEmail).toBe(true);
+  });
 });

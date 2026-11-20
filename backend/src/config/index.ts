@@ -15,6 +15,7 @@ const schema = z.object({
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error', 'silent']).default('info'),
   AUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(10),
   API_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(300),
+  BETA_SKIP_EMAIL_VERIFICATION: z.enum(['true', 'false']).default('false'),
   SMTP_HOST: z.string().optional(),
   SMTP_PORT: z.coerce.number().int().positive().default(587),
   SMTP_USER: z.string().optional(),
@@ -31,6 +32,7 @@ export type Config = {
   refreshTokenTtlSeconds: number;
   allowedEmailDomains: string[];
   authProvider: 'dev' | 'local';
+  skipEmailVerification: boolean;
   corsOrigins: string[];
   publicAppUrl: string;
   logLevel: string;
@@ -68,6 +70,7 @@ export function loadConfig(source: NodeJS.ProcessEnv = process.env): Config {
     refreshTokenTtlSeconds: e.REFRESH_TOKEN_TTL_SECONDS,
     allowedEmailDomains: csv(e.ALLOWED_EMAIL_DOMAINS).map((d) => d.toLowerCase()),
     authProvider: e.AUTH_PROVIDER,
+    skipEmailVerification: e.BETA_SKIP_EMAIL_VERIFICATION === 'true',
     corsOrigins: csv(e.CORS_ORIGINS),
     publicAppUrl: e.PUBLIC_APP_URL,
     logLevel: e.LOG_LEVEL,

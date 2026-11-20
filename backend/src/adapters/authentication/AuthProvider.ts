@@ -27,8 +27,13 @@ class BcryptProvider implements AuthProvider {
   }
 }
 
-/** Production-shaped provider: emails must be verified before login. Replace for DUO/SSO. */
-export const createLocalAuthProvider = (): AuthProvider => new BcryptProvider('local', false, 12);
+/**
+ * Production-shaped provider: emails must be verified before login. Replace for DUO/SSO.
+ * `autoVerifyEmail` is the explicit BETA_SKIP_EMAIL_VERIFICATION opt-in: strong password hashing stays, but anyone
+ * who registers with an approved domain is treated as verified. Do not enable once an email provider works.
+ */
+export const createLocalAuthProvider = (autoVerifyEmail = false): AuthProvider =>
+  new BcryptProvider('local', autoVerifyEmail, 12);
 
 /** Development/test only (config rejects it in production): low bcrypt cost, emails auto-verified. */
 export const createDevAuthProvider = (): AuthProvider => new BcryptProvider('dev', true, 4);
