@@ -1,5 +1,6 @@
 // Home — the swipe deck (PRD FR-01 / FR-03 / FR-07).
-// The deck comes from GET /api/events?feed=true, which leaves out events you already joined or passed.
+// The deck comes from GET /api/recommendations/events (ordered by how well events match your profile),
+// falling back to GET /api/events?feed=true. Both leave out events you already joined or passed.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import * as api from '../api';
@@ -28,9 +29,22 @@ export default function HomePage() {
     setLoading(true);
     setError(null);
     try {
-      const page = await api.listEvents({ feed: true, limit: 20 });
-      setDeck(page.items.filter((e) => !skipped.current.has(e.id)));
-      setHasMore(page.hasMore);
+      // "For You" (FR-09): best interest/skill/major matches first. Falls back to the plain feed if it fails or is empty.
+      let items = [];
+      let more = false;
+      try {
+        const recs = await api.getRecommendations(20);
+        items = recs.map((r) => r.event).filter((e) => !skipped.current.has(e.id));
+      } catch {
+        /* fall through to the plain feed */
+      }
+      if (items.length === 0) {
+        const page = await api.listEvents({ feed: true, limit: 20 });
+        items = page.items.filter((e) => !skipped.current.has(e.id));
+        more = page.hasMore;
+      }
+      setDeck(items);
+      setHasMore(more);
     } catch (err) {
       setError(err);
     } finally {
